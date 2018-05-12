@@ -33,6 +33,7 @@ export default {
 
 <style>
   .block {
+    margin-right: 70px;
     position: relative;
     float:right;
     font-size: 15px;

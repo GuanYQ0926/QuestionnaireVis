@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --mode development --progress --hot --open",
-    "build": "webpack --mode production",
-    "build-docs": "webpack --mode production",
+    "build": "webpack --mode production"
   },
+  "homepage": "https://github.com/GuanYQ0926/GuanYQ0926.github.io",
   "author": "YuqingGuan",
   "license": "ISC",
   "devDependencies": {
