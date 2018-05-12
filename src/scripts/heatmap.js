@@ -215,7 +215,7 @@ export default class Heatmap {
         return
       }
       else {
-        d3.json('../assets/questions.json').then(function(data) {
+        d3.json('../../static/questions.json').then(function(data) {
           const questionList = data.questions
           const answerList = ['思う', 'やや思う', 'どちらともいえない', 'あまり思わない', '思わない', '--']
 

@@ -10,7 +10,7 @@ export default class Wordlayout {
     this.renderScene()
   }
   renderScene() {
-    fetch('../../assets/wordcloud.json').then(function(res) {
+    fetch('../../static/wordcloud.json').then(function(res) {
       return res.json()
     }).then(function(data) {
       const listA = [],

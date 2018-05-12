@@ -36,6 +36,4 @@ export default {
     font-family: Consolas, courier;
     fill: #000;
   }
-  .brush {
-  }
 </style>

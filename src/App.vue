@@ -32,28 +32,28 @@ import Wordcloud from './components/Wordlayout.vue'
 export default {
   name: 'App',
   data: () => ({
-    data1: '../assets/A1.json',
+    data1: '../static/A1.json',
     dataset1: [
-      {value: '../assets/A.json', label: 'A初産'},
-      {value: '../assets/A1.json', label: 'A1初期'},
-      {value: '../assets/A2.json', label: 'A2中期'},
-      {value: '../assets/A3.json', label: 'A3後期'},
-      {value: '../assets/B.json', label: 'B径産'},
-      {value: '../assets/B1.json', label: 'B1初期'},
-      {value: '../assets/B2.json', label: 'B2中期'},
-      {value: '../assets/B3.json', label: 'B3後期'}
+      {value: '../static/A.json', label: 'A初産'},
+      {value: '../static/A1.json', label: 'A1初期'},
+      {value: '../static/A2.json', label: 'A2中期'},
+      {value: '../static/A3.json', label: 'A3後期'},
+      {value: '../static/B.json', label: 'B径産'},
+      {value: '../static/B1.json', label: 'B1初期'},
+      {value: '../static/B2.json', label: 'B2中期'},
+      {value: '../static/B3.json', label: 'B3後期'}
     ],
     data2: 'None',
     dataset2: [
       {value: 'None', label: '--'},
-      {value: '../assets/A.json', label: 'A初産'},
-      {value: '../assets/A1.json', label: 'A1初期'},
-      {value: '../assets/A2.json', label: 'A2中期'},
-      {value: '../assets/A3.json', label: 'A3後期'},
-      {value: '../assets/B.json', label: 'B径産'},
-      {value: '../assets/B1.json', label: 'B1初期'},
-      {value: '../assets/B2.json', label: 'B2中期'},
-      {value: '../assets/B3.json', label: 'B3後期'}
+      {value: '../static/A.json', label: 'A初産'},
+      {value: '../static/A1.json', label: 'A1初期'},
+      {value: '../static/A2.json', label: 'A2中期'},
+      {value: '../static/A3.json', label: 'A3後期'},
+      {value: '../static/B.json', label: 'B径産'},
+      {value: '../static/B1.json', label: 'B1初期'},
+      {value: '../static/B2.json', label: 'B2中期'},
+      {value: '../static/B3.json', label: 'B3後期'}
     ],
     brush: false
   }),

@@ -1,0 +1,10 @@
+{
+  "name": "questionnaire-vis",
+  "version": "1.0.0",
+  "description": "",
+  "author": "YuqingGuan",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install express"
+  }
+}
