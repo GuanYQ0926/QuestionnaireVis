@@ -88,6 +88,7 @@ export default class Heatmap {
         .attr('height', gridSize)
         .style('fill', colors[0])
         .on('mouseover', d => mouseoverGrid(d))
+        .on('mouseleave', () => (d3.select('#text_g').remove()))
         .merge(grids)
         .transition()
         .duration(1000)

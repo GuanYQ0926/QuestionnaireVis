@@ -55,7 +55,7 @@ export default {
       {value: '../static/B2.json', label: 'B2中期'},
       {value: '../static/B3.json', label: 'B3後期'}
     ],
-    brush: false
+    brush: true
   }),
   components: {
     heatmap: Heatmap,
