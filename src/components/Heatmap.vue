@@ -11,7 +11,7 @@ export default {
     hm: new Heatmap(),
   }),
   mounted() {
-    this.eventHub.$on('initHeatmapScene', (data1, data2, brush) => this.hm.initScene(data1, data2, brush))
+    this.eventHub.$on('initHeatmapScene', (data1, data2) => this.hm.initScene(data1, data2))
   }
 }
 </script>

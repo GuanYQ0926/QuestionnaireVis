@@ -1,6 +1,6 @@
 <template>
   <div id="wordlayout">
-    <table class="block">
+    <!-- <table class="block">
       <tr><td>
         <div>
           <p>ワード クラウド A</p>
@@ -13,7 +13,9 @@
           <canvas id="word_canvas_b"></canvas>
         </div>
       </td></tr>
-    </table>
+    </table> -->
+    <canvas id="word_canvas_a"></canvas>
+    <canvas id="word_canvas_b"></canvas>
   </div>
 </template>
 
@@ -26,7 +28,7 @@ export default {
     wc: new Wordlayout(),
   }),
   mounted() {
-    this.eventHub.$on('initWordlayoutScene', () => this.wc.initScene())
+    this.eventHub.$on('initWordlayoutScene', (word1, word2) => this.wc.initScene(word1, word2))
   }
 }
 </script>

@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import colormap from 'colormap'
-import Chart from 'chart.js'
+// import Chart from 'chart.js'
 
 
 export default class Heatmap {
@@ -8,16 +8,15 @@ export default class Heatmap {
     this.margin = {top: 50, right: 0, bottom: 100, left: 30}
     this.questionNum = 97
     this.width = window.innerWidth
-    // this.height = window.innerHeight
     this.height = Math.floor((this.width - this.margin.left - this.margin.right) / this.questionNum) *16
   }
-  initScene(file1, file2, brushon) {
-    this.renderScene(file1, file2, brushon)
+  initScene(file1, file2) {
+    this.renderScene(file1, file2)
   }
-  renderScene(file1, file2, brushon) {
+  renderScene(file1, file2) {
     const margin = this.margin,
       gridSize = Math.floor((this.width - margin.left - margin.right) / this.questionNum),
-      answers = ['1', '2', '3', '4', '5', '6'],
+      answers = ['1', '2', '3', '4', '5'],
       buckets = 9,
       legendElementWidth = gridSize * 2,
       questions = d3.range(1, 30)//0-28 29-53 54-70 71-96
@@ -25,13 +24,13 @@ export default class Heatmap {
           .concat(d3.range(1, 18)
             .concat(d3.range(1, 27)))).map(d => d.toString())
     const width = this.width-margin.left-margin.right,
-      height = 6*gridSize
-    // linechart
-    const linecanvas = document.getElementById('line_canvas')
-    const ctx = linecanvas.getContext('2d')
-    ctx.canvas.width = width / 1.5
-    ctx.canvas.height = 30 * gridSize
-    let linechart = new Chart(linecanvas, {options: {responsive: false, maintainAspectRatio: false}})
+      height = 5*gridSize
+    // // linechart
+    // const linecanvas = document.getElementById('line_canvas')
+    // const ctx = linecanvas.getContext('2d')
+    // ctx.canvas.width = width / 1.5
+    // ctx.canvas.height = 30 * gridSize
+    // let linechart = new Chart(linecanvas, {options: {responsive: false, maintainAspectRatio: false}})
 
     document.getElementById('heatmap').innerHTML = ''
     const svg = d3.select(document.getElementById('heatmap')).append('svg')
@@ -61,7 +60,7 @@ export default class Heatmap {
       .attr('transform', `translate(${gridSize/2}, -6)`)
       .attr('class', (d, i) => {return (i>=29&&i<=53) || (i>=71&&i<=96) ? 'q24' : 'q13'})
 
-    const heatmapChart = function(data, colors) {
+    function heatmapChart(data, colors) {
       const mindata = d3.min(data, d => d.value)
       const maxdata = d3.max(data, d => d.value)
       const delta = (maxdata - mindata) / buckets
@@ -118,149 +117,141 @@ export default class Heatmap {
       legend.exit().remove()
     }
 
-    const brushChart = function(data) {
-      const xScale = d3.scaleLinear().range([0, width])
-      const brush = d3.brushX()
-        .extent([[0, 0], [width, height]])
-        .on('start', brushmoved) // 'start brush end'
-      const gBrush = g.append('g')
-        .attr('class', 'brush')
-        .call(brush)
-
-      gBrush.selectAll('.handle--custom')
-        .data([{type: 'w'}, {type: 'e'}])
-        .enter().append('path')
-        .attr('class', 'handle--custom')
-        .attr('stroke', '#000')
-        .attr('cursor', 'ew-resize')
-      gBrush.call(brush.move, [0.0, 0.1].map(xScale))
-      function brushmoved() {
-        const s = d3.event.selection
-        if (s != null) {
-          const sx = s.map(xScale.invert)
-          // draw linechart
-          const start = Math.round(sx[0] * 97)
-          const len = Math.round((sx[1] - sx[0]) * 97)
-          const end = start + len
-          const data1 = [],
-            data2 = [],
-            data3 = [],
-            data4 = [],
-            data5 = [],
-            data6 = []
-          for(let i=0;i<end;i++) {
-            if(i >= start) {
-              data1.push(data[i*6].value)
-              data2.push(data[i*6+1].value)
-              data3.push(data[i*6+2].value)
-              data4.push(data[i*6+3].value)
-              data5.push(data[i*6+4].value)
-              data6.push(data[i*6+5].value)
-            }
-          }
-
-          linechart.destroy()
-          linechart = new Chart(linecanvas, {
-            type: 'line',
-            data: {
-              labels: d3.range(start, end),
-              datasets: [
-                {
-                  label: '思う',
-                  borderColor: '#ff6384',
-                  data: data1,
-                  fill: false
-                },
-                {
-                  label: 'やや思う',
-                  borderColor: '#36a2eb',
-                  data: data2,
-                  fill: false
-                },
-                {
-                  label: 'どちらともいえない',
-                  borderColor: '#cc65fe',
-                  data: data3,
-                  fill: false
-                },
-                {
-                  label: 'あまり思わない',
-                  borderColor: '#ffce56',
-                  data: data4,
-                  fill: false
-                },
-                {
-                  label: '思わない',
-                  borderColor: '#3cba9f',
-                  data: data5,
-                  fill: false
-                },{
-                  label: '--',
-                  borderColor: '#e8c3b9',
-                  data: data6,
-                  fill: false
-                }
-              ]
-            },
-            options: {
-              responsive: false,
-              maintainAspectRatio: false
-            }
-          })
-        }
-      }
-    }
+    // const brushChart = function(data) {
+    //   const xScale = d3.scaleLinear().range([0, width])
+    //   const brush = d3.brushX()
+    //     .extent([[0, 0], [width, height]])
+    //     .on('start', brushmoved) // 'start brush end'
+    //   const gBrush = g.append('g')
+    //     .attr('class', 'brush')
+    //     .call(brush)
+    //
+    //   gBrush.selectAll('.handle--custom')
+    //     .data([{type: 'w'}, {type: 'e'}])
+    //     .enter().append('path')
+    //     .attr('class', 'handle--custom')
+    //     .attr('stroke', '#000')
+    //     .attr('cursor', 'ew-resize')
+    //   gBrush.call(brush.move, [0.0, 0.1].map(xScale))
+    //   function brushmoved() {
+    //     const s = d3.event.selection
+    //     if (s != null) {
+    //       const sx = s.map(xScale.invert)
+    //       // draw linechart
+    //       const start = Math.round(sx[0] * 97)
+    //       const len = Math.round((sx[1] - sx[0]) * 97)
+    //       const end = start + len
+    //       const data1 = [],
+    //         data2 = [],
+    //         data3 = [],
+    //         data4 = [],
+    //         data5 = [],
+    //         data6 = []
+    //       for(let i=0;i<end;i++) {
+    //         if(i >= start) {
+    //           data1.push(data[i*6].value)
+    //           data2.push(data[i*6+1].value)
+    //           data3.push(data[i*6+2].value)
+    //           data4.push(data[i*6+3].value)
+    //           data5.push(data[i*6+4].value)
+    //           data6.push(data[i*6+5].value)
+    //         }
+    //       }
+    //
+    //       linechart.destroy()
+    //       linechart = new Chart(linecanvas, {
+    //         type: 'line',
+    //         data: {
+    //           labels: d3.range(start, end),
+    //           datasets: [
+    //             {
+    //               label: '思う',
+    //               borderColor: '#ff6384',
+    //               data: data1,
+    //               fill: false
+    //             },
+    //             {
+    //               label: 'やや思う',
+    //               borderColor: '#36a2eb',
+    //               data: data2,
+    //               fill: false
+    //             },
+    //             {
+    //               label: 'どちらともいえない',
+    //               borderColor: '#cc65fe',
+    //               data: data3,
+    //               fill: false
+    //             },
+    //             {
+    //               label: 'あまり思わない',
+    //               borderColor: '#ffce56',
+    //               data: data4,
+    //               fill: false
+    //             },
+    //             {
+    //               label: '思わない',
+    //               borderColor: '#3cba9f',
+    //               data: data5,
+    //               fill: false
+    //             },{
+    //               label: '--',
+    //               borderColor: '#e8c3b9',
+    //               data: data6,
+    //               fill: false
+    //             }
+    //           ]
+    //         },
+    //         options: {
+    //           responsive: false,
+    //           maintainAspectRatio: false
+    //         }
+    //       })
+    //     }
+    //   }
+    // }
 
     function mouseoverGrid(gridData) {
-      if(brushon) {
-        return
-      }
-      else {
-        d3.json('../../static/questions.json').then(function(data) {
-          const questionList = data.questions
-          const answerList = ['思う', 'やや思う', 'どちらともいえない', 'あまり思わない', '思わない', '--']
+      d3.json('../../static/questions.json').then(function(data) {
+        const questionList = data.questions
+        const answerList = ['思う', 'やや思う', 'どちらともいえない', 'あまり思わない', '思わない']
 
-          d3.select('#text_g').remove()
-          const text_g = svg.append('g')
-            .attr('id', 'text_g')
-            .attr('transform', `translate(${margin.left}, ${margin.top})`)
-          const gridText = text_g.selectAll('.gridText')
-            .data([gridData])
-          gridText.enter().append('text')
-            .text(d => {
-              if(file2 == 'None') {
-                return `問題：${questionList[d.question]} に 「${answerList[d.answer]}」と回答した人数は${d.value}名`
+        d3.select('#text_g').remove()
+        const text_g = svg.append('g')
+          .attr('id', 'text_g')
+          .attr('transform', `translate(${margin.left}, ${margin.top})`)
+        const gridText = text_g.selectAll('.gridText')
+          .data([gridData])
+        gridText.enter().append('text')
+          .text(d => {
+            if(file2 == 'None') {
+              return `問題：${questionList[d.question]} に 「${answerList[d.answer]}」と回答した人数は${d.value}名`
+            }
+            else {
+              const fn1 = file1.split('/')[2].split('.')[0],
+                fn2 = file2.split('/')[2].split('.')[0]
+              if(d.value == 0) {
+                return `${fn1}と${fn2}は 問題：${questionList[d.question]} に 「${answerList[d.answer]}」と回答した人数が同じ`
+              }
+              else if (d.value > 0) {
+                return `${fn1}は${fn2}より 問題：${questionList[d.question]} に 「${answerList[d.answer]}」と回答した人数が${d.value}人多い`
               }
               else {
-                const fn1 = file1.split('/')[2].split('.')[0],
-                  fn2 = file2.split('/')[2].split('.')[0]
-                if(d.value == 0) {
-                  return `${fn1}と${fn2}は 問題：${questionList[d.question]} に 「${answerList[d.answer]}」と回答した人数が同じ`
-                }
-                else if (d.value > 0) {
-                  return `${fn1}は${fn2}より 問題：${questionList[d.question]} に 「${answerList[d.answer]}」と回答した人数が${d.value}人多い`
-                }
-                else {
-                  return `${fn1}は${fn2}より 問題：${questionList[d.question]} に 「${answerList[d.answer]}」と回答した人数が${-d.value}人少ない`
-                }
+                return `${fn1}は${fn2}より 問題：${questionList[d.question]} に 「${answerList[d.answer]}」と回答した人数が${-d.value}人少ない`
               }
-            })
-            .attr('x', width/3)
-            .attr('y', gridSize*10)
-            .style('text-anchor', 'middle')
-            .style('font-size', '0.7em')
-            .attr('class', 'details')
-        })
-      }
+            }
+          })
+          .attr('x', width/3)
+          .attr('y', gridSize*10)
+          .style('text-anchor', 'middle')
+          .style('font-size', '0.7em')
+          .attr('class', 'details')
+      })
     }
 
     if(file2 == 'None') {
       d3.json(file1).then(function(data) {
         const colors = ['#ffffd9', '#edf8b1', '#c7e9b4', '#7fcdbb', '#41b6c4', '#1d91c0', '#225ea8', '#253494', '#081d58']
         heatmapChart(data, colors)
-        if(brushon) {
-          brushChart(data)
-        }
       })
     }
     else {
@@ -278,9 +269,6 @@ export default class Heatmap {
             alpha: 1
           })
           heatmapChart(data, colors)
-          if(brushon) {
-            brushChart(data)
-          }
         })
       })
     }
