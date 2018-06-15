@@ -83,36 +83,11 @@ def wordcloud_data():
     with open('../static/wordcloud/service.json', 'w') as f:
         json.dump(service_jsonfile, f)
 
-# def wordcloud_data():
-#     tagger = MeCab.Tagger('mecabrc')
-#     tagger.parse('')
-#     filenames = ['A', 'B']
-#     jsonfile = {}
-#     for fn in filenames:
-#         result = collections.defaultdict(int)
-#         dataset = pd.read_csv('../data/' + fn + '.csv',
-#                               usecols=range(104, 110))
-#         dataset = dataset.values
-#         for row_data in dataset:
-#             for text in row_data:
-#                 if pd.isnull(text):
-#                     continue
-#                 temp = tagger.parse(text)
-#                 for row in temp.split('\n'):
-#                     word = row.split('\t')[0]
-#                     if word == 'EOS':
-#                         break
-#                     else:
-#                         pos = row.split('\t')[1].split(',')[0]
-#                         # if pos != '助詞' and pos != '助動詞':
-#                         if pos == '名詞' or pos == '動詞' or pos == '形容詞':
-#                             result[word] += 1
-#         jsonfile[fn] = result
-#     with open('../static/wordcloud.json', 'w') as f:
-#         json.dump(jsonfile, f)
-
 
 def question_xlsx():
+    '''
+    export overview of concerned question to xlsx
+    '''
     # index: quesion
     filename = '../data/raw/dataset/layout.csv'
     dataset = pd.read_csv(filename, header=None, usecols=[8])
@@ -166,6 +141,55 @@ def question_xlsx():
     workbook.close()
 
 
+def answer_xlsx():
+    '''
+    return top quesiton and answers(self handle, deseired service)
+    {question:{handle1:[service1, service2]}}
+    export to xlsx
+    '''
+    fileinfo = {'c_all': 'C妊娠期仕事有n=527', 'c_1': 'C1初産n=322',
+                'c_2': 'C2径産n=205', 'c_3': 'C3初期n=206', 'c_4': 'C4中期n=160',
+                'c_5': 'C5後期n=161', 'd_all': 'D妊娠期仕事なしn=709'}
+    for fn, desc in fileinfo.items():
+        # question information
+        dataset = pd.read_csv('../data/raw/text_questions/'+fn+'_ranking.csv')
+        q_info = dataset.values[:10]
+        # answer information
+        dataset = pd.read_csv('../data/raw/dataset/'+fn+'.csv',
+                              usecols=range(149, 158))
+        a_info = dataset.values
+        # process data
+        question_handle = collections.defaultdict(
+            lambda: collections.defaultdict(list))
+        for q_one in q_info:
+            q_index = q_one[2]
+            for a_one in a_info:
+                for i in [0, 1, 2]:
+                    if pd.isnull(a_one[i]):
+                        continue
+                    if a_one[i] == q_index:
+                        handle, service = a_one[3+i*2], a_one[4+i*2]
+                        if pd.isnull(handle) or pd.isnull(service):
+                            continue
+                        question_handle[q_index][handle].append(service)
+        # export to xlsx
+        xls_path = '../data/raw/text_questions/'+fn+'_answer.xlsx'
+        workbook = xlsxwriter.Workbook(xls_path)
+        for question, handle_service in question_handle.items():
+            worksheet = workbook.add_worksheet(str(question))
+            worksheet.set_column('A:A', 100)
+            worksheet.set_column('B:B', 100)
+            worksheet.write('A1', '自己対処')
+            worksheet.write('B1', 'サービス')
+            row = 2
+            for handle, service in handle_service.items():
+                worksheet.write('A'+str(row), handle)
+                for serv in service:
+                    worksheet.write('B'+str(row), serv)
+                    row += 1
+        workbook.close()
+
+
 def question_list():
     filename = 'Layout'
     dataset = pd.read_csv('../data/' + filename + '.csv',
@@ -181,8 +205,55 @@ def question_list():
         json.dump(jsonfile, f)
 
 
+def handle_service_data():
+    filenames = ['c_all_handle_service_revised']
+    for fn in filenames:
+        dataset = pd.read_csv('../data/raw/text_questions/'+fn+'.csv',
+                              usecols=[1, 2])
+        dataset = dataset.values
+        handle_count = collections.defaultdict(int)
+        service_count = collections.defaultdict(int)
+        for data in dataset:
+            handle, service = data[0], data[1]
+            handle_count[handle] += 1
+            service_count[service] += 1
+        # generate node
+        hnodes, snodes, edges = [], [], []
+        node_handle_id = {}
+        node_service_id = {}
+        hnode_id, snode_id = 0, 0
+        for data in dataset:
+            handle, service = data[0], data[1]
+            if handle not in node_handle_id:
+                node_handle_id[handle] = hnode_id
+                count = handle_count[handle]
+                hnodes.append(dict(nid=hnode_id, count=count, type='handle',
+                                   text=handle))
+                hnode_id += 1
+            if service not in node_service_id:
+                node_service_id[service] = snode_id
+                count = service_count[service]
+                snodes.append(dict(nid=snode_id, count=count, type='service',
+                                   text=service))
+                snode_id += 1
+            edges.append(dict(source=node_handle_id[handle],
+                              target=node_service_id[service]))
+        # sort nodes
+        hnodes = sorted(hnodes, key=lambda d: d['count'], reverse=True)
+        snodes = sorted(snodes, key=lambda d: d['count'], reverse=True)
+        for i, node in enumerate(hnodes):
+            node['nid'] = i
+        for i, node in enumerate(snodes):
+            node['nid'] = i
+        with open('../data/raw/text_questions/relation.json', 'w') as f:
+            jsonfile = dict(hnodes=hnodes, snodes=snodes, edges=edges)
+            json.dump(jsonfile, f)
+
+
 if __name__ == '__main__':
-    heatmap_data()
+    # heatmap_data()
     # wordcloud_data()
     # question_list()
     # question_xlsx()
+    # answer_xlsx()
+    handle_service_data()

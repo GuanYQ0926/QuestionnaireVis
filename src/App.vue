@@ -19,7 +19,7 @@
       </el-select>
     </div>
     <heatmap></heatmap>
-    <div id="wordcloud-selector">
+    <!-- <div id="wordcloud-selector">
       <el-select v-model="word1" placeholder="C妊娠期仕事有" size="mini">
         <el-option
           v-for="data in wordcloud1"
@@ -36,15 +36,16 @@
           :value="data.value">
         </el-option>
       </el-select>
-    </div>
-    <!-- <canvas id="line_canvas"></canvas> -->
+    </div> -->
     <wordcloud></wordcloud>
+    <relationgraph></relationgraph>
   </div>
 </template>
 
 <script>
 import Heatmap from './components/Heatmap.vue'
 import Wordcloud from './components/Wordlayout.vue'
+import Relationgraph from './components/Relationgraph.vue'
 
 export default {
   name: 'App',
@@ -72,30 +73,31 @@ export default {
       {value: '../static/B2.json', label: 'B2中期'},
       {value: '../static/B3.json', label: 'B3後期'}
     ],
-    word1: 'c_all',
-    wordcloud1: [
-      {value: 'c_all', label: 'C妊娠期仕事有'},
-      {value: 'c_1', label: 'C1初産n'},
-      {value: 'c_2', label: 'C2径産'},
-      {value: 'c_3', label: 'C3初期'},
-      {value: 'c_4', label: 'C4中期'},
-      {value: 'c_5', label: 'C5後期'},
-      {value: 'd_all', label: 'D妊娠期仕事なし'}
-    ],
-    word2: 'd_all',
-    wordcloud2: [
-      {value: 'c_all', label: 'C妊娠期仕事有'},
-      {value: 'c_1', label: 'C1初産n'},
-      {value: 'c_2', label: 'C2径産'},
-      {value: 'c_3', label: 'C3初期'},
-      {value: 'c_4', label: 'C4中期'},
-      {value: 'c_5', label: 'C5後期'},
-      {value: 'd_all', label: 'D妊娠期仕事なし'}
-    ],
+    // word1: 'c_all',
+    // wordcloud1: [
+    //   {value: 'c_all', label: 'C妊娠期仕事有'},
+    //   {value: 'c_1', label: 'C1初産n'},
+    //   {value: 'c_2', label: 'C2径産'},
+    //   {value: 'c_3', label: 'C3初期'},
+    //   {value: 'c_4', label: 'C4中期'},
+    //   {value: 'c_5', label: 'C5後期'},
+    //   {value: 'd_all', label: 'D妊娠期仕事なし'}
+    // ],
+    // word2: 'd_all',
+    // wordcloud2: [
+    //   {value: 'c_all', label: 'C妊娠期仕事有'},
+    //   {value: 'c_1', label: 'C1初産n'},
+    //   {value: 'c_2', label: 'C2径産'},
+    //   {value: 'c_3', label: 'C3初期'},
+    //   {value: 'c_4', label: 'C4中期'},
+    //   {value: 'c_5', label: 'C5後期'},
+    //   {value: 'd_all', label: 'D妊娠期仕事なし'}
+    // ],
   }),
   components: {
     heatmap: Heatmap,
-    wordcloud: Wordcloud
+    wordcloud: Wordcloud,
+    relationgraph: Relationgraph,
   },
   watch: {
     data1(val) {
@@ -104,18 +106,19 @@ export default {
     data2(val) {
       this.eventHub.$emit('initHeatmapScene', this.data1, this.data2)
     },
-    word1(val) {
-      this.eventHub.$emit('initWordlayoutScene', this.word1, this.word2)
-    },
-    word2(val) {
-      this.eventHub.$emit('initWordlayoutScene', this.word1, this.word2)
-    },
+    // word1(val) {
+    //   this.eventHub.$emit('initWordlayoutScene', this.word1, this.word2)
+    // },
+    // word2(val) {
+    //   this.eventHub.$emit('initWordlayoutScene', this.word1, this.word2)
+    // },
   },
   methods: {
   },
   mounted() {
     this.eventHub.$emit('initHeatmapScene', this.data1, this.data2)
     this.eventHub.$emit('initWordlayoutScene', this.word1, this.word2)
+    this.eventHub.$emit('initRelationgraphScene')
   }
 }
 </script>
