@@ -67,6 +67,14 @@ export default {
       {value: 'd_all', label: 'D妊娠期仕事なし'}
     ],
   }),
+  watch: {
+    word1(val) {
+      this.wc.initScene(this.word1, this.word2)
+    },
+    word2(val) {
+      this.wc.initScene(this.word1, this.word2)
+    },
+  }
   mounted() {
     this.wc.initScene(this.word1, this.word2)
   }
