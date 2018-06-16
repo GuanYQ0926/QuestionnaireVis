@@ -3,8 +3,8 @@ import * as d3 from 'd3'
 
 export default class Relationgraph {
   constructor() {
-    this.width = window.innerWidth / 4 * 3
-    this.height = window.innerHeight*1.2
+    this.width = 1000
+    this.height = 960
   }
   initScene() {
     fetch('../static/relation.json')
@@ -13,16 +13,16 @@ export default class Relationgraph {
         const hnodes = dataset.hnodes,
           snodes = dataset.snodes,
           edges = dataset.edges,
-          space = 400
+          space = 200
         // prepare node data
         for(const i in hnodes) {
           const node = hnodes[i]
-          node.x = 470
+          node.x = 400
           node.y = (node.nid+1) * 17
         }
         for(const i in snodes) {
           const node = snodes[i]
-          node.x = 470+space
+          node.x = 400+space
           node.y = (node.nid+1) * 17
         }
         const nodeData = hnodes.concat(snodes)
@@ -37,7 +37,7 @@ export default class Relationgraph {
           edgeData.push({source: source, target: target})
         }
 
-        const margin = {top: 20, right: 10, bottom: 10, left: 100}
+        const margin = {top: 20, right: 10, bottom: 10, left: 10}
         const svg = d3.select(document.getElementById('relationgraph'))
           .append('svg')
           .attr('width', this.width)
@@ -50,8 +50,8 @@ export default class Relationgraph {
 
         // darw title
         const titleData = [
-          {text: '自己対処: 人数', x:470, y:0, position: 'end'},
-          {text: '希望するサービス: 人数', x:470+space, y:0, position: 'start'}]
+          {text: '自己対処: 人数', x:400, y:0, position: 'end'},
+          {text: '希望するサービス: 人数', x:400+space, y:0, position: 'start'}]
         svg.selectAll('.title')
           .data(titleData)
           .enter().append('g')
