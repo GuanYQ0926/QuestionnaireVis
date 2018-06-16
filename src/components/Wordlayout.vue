@@ -68,7 +68,6 @@ export default {
     ],
   }),
   mounted() {
-    // this.eventHub.$on('initWordlayoutScene', (this.word1, this.word2) => this.wc.initScene(this.word1, this.word2))
     this.wc.initScene(this.word1, this.word2)
   }
 }

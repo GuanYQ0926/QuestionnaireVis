@@ -12,7 +12,7 @@ export default {
   }),
   mounted() {
     this.eventHub.$on('initHeatmapScene', (data1, data2) => this.hm.initScene(data1, data2))
-  }
+  },
 }
 </script>
 
