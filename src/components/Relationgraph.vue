@@ -21,7 +21,7 @@ export default {
 <style>
 #relationgraph {
   position: relative;
-  float: right;
+  float: left;
 }
 .links path {
   fill: #777;
@@ -38,6 +38,9 @@ export default {
 
 .nodes text {
   font: 10px sans-serif;
+}
+
+.title text {
 }
 
 </style>
