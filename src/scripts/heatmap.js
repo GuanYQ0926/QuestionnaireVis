@@ -61,7 +61,7 @@ export default class Heatmap {
             const gridData = []
             for(let i=0; i<gridData1.length; i++) {
               const temp = gridData1[i].value - gridData2[i].value
-              gridData.push({question: gridData1[i].question, answer: gridData1[i].answer, value: temp})
+              gridData.push({question: gridData1[i].question, answer: gridData1[i].answer, value: temp, value1:gridData1[i].value, value2:gridData2[i].value})
             }
             heatmapChartCompare(gridData, questionData.questions)
           })
@@ -154,7 +154,7 @@ export default class Heatmap {
             return colorScalePlus(d.value)
           }
         })
-        .on('mouseover', d => mouseoverGrid(d, questionData))
+        .on('mouseover', d => mouseoverGridCompare(d, questionData))
         .on('mouseleave', () => (d3.select('#text_g').remove()))
         .merge(grids)
         .transition()
@@ -227,26 +227,43 @@ export default class Heatmap {
       const gridText = text_g.selectAll('.gridText')
         .data([gData])
       gridText.enter().append('text')
-        .text(d => {
-          if(file2 == 'None') {
-            return `問題：${qData[d.question]} に 「${answerList[d.answer]}」と回答した人数は${d.value}名`
-          }
-          else {
-            const fn1 = file1.split('/')[2].split('.')[0],
-              fn2 = file2.split('/')[2].split('.')[0]
-            if(d.value == 0) {
-              return `${fn1}と${fn2}は 問題：${qData[d.question]} に 「${answerList[d.answer]}」と回答した人数が同じ`
-            }
-            else if (d.value > 0) {
-              return `${fn1}は${fn2}より 問題：${qData[d.question]} に 「${answerList[d.answer]}」と回答した人数が${d.value}人多い`
-            }
-            else {
-              return `${fn1}は${fn2}より 問題：${qData[d.question]} に 「${answerList[d.answer]}」と回答した人数が${-d.value}人少ない`
-            }
-          }
-        })
+        .text(d => `問題：${qData[d.question]}`)
         .attr('x', legendWidth+70)
         .attr('y', gridSize*5.5+margin.top)
+        .style('text-anchor', 'start')
+        .style('font-size', '0.7em')
+        .attr('class', 'details')//
+      gridText.enter().append('text')
+        .text(d => `回答：${answerList[d.answer]}：${d.value}`)
+        .attr('x', legendWidth+70)
+        .attr('y', gridSize*6.5+margin.top)
+        .style('text-anchor', 'start')
+        .style('font-size', '0.7em')
+        .attr('class', 'details')
+    }
+    function mouseoverGridCompare(gData, qData) {
+      const answerList = ['思う', 'やや思う', 'どちらともいえない', 'あまり思わない', '思わない']
+      d3.select('#text_g').remove()
+      const text_g = svg.append('g')
+        .attr('id', 'text_g')
+        .attr('transform', `translate(${margin.left}, ${margin.top})`)
+      const gridText = text_g.selectAll('.gridText')
+        .data([gData])
+      gridText.enter().append('text')
+        .text(d => `問題：${qData[d.question]}`)
+        .attr('x', legendWidth+70)
+        .attr('y', gridSize*5.5+margin.top)
+        .style('text-anchor', 'start')
+        .style('font-size', '0.7em')
+        .attr('class', 'details')
+      gridText.enter().append('text')
+        .text(d => {
+          const fn1 = file1.split('/')[2].split('.')[0],
+            fn2 = file2.split('/')[2].split('.')[0]
+          return `回答：${answerList[d.answer]}    ${fn1}：${d.value1} ${fn2}：${d.value2}    差：${d.value}`
+        })
+        .attr('x', legendWidth+70)
+        .attr('y', gridSize*6.5+margin.top)
         .style('text-anchor', 'start')
         .style('font-size', '0.7em')
         .attr('class', 'details')
