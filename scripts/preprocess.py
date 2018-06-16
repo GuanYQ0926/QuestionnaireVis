@@ -239,15 +239,16 @@ def handle_service_data():
             edges.append(dict(source=node_handle_id[handle],
                               target=node_service_id[service]))
         # sort nodes
-        hnodes = sorted(hnodes, key=lambda d: d['count'], reverse=True)
-        snodes = sorted(snodes, key=lambda d: d['count'], reverse=True)
-        for i, node in enumerate(hnodes):
-            node['nid'] = i
-        for i, node in enumerate(snodes):
-            node['nid'] = i
+        # hnodes = sorted(hnodes, key=lambda d: d['count'], reverse=True)
+        # snodes = sorted(snodes, key=lambda d: d['count'], reverse=True)
+        # for i, node in enumerate(hnodes):
+        #     node['nid'] = i
+        # for i, node in enumerate(snodes):
+        #     node['nid'] = i
         with open('../data/raw/text_questions/relation.json', 'w') as f:
             jsonfile = dict(hnodes=hnodes, snodes=snodes, edges=edges)
             json.dump(jsonfile, f)
+            print('end')
 
 
 if __name__ == '__main__':
