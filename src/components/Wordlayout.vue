@@ -69,14 +69,15 @@ export default {
   }),
   watch: {
     word1(val) {
-      this.wc.initScene(this.word1, this.word2)
+      this.wc.initScene(this.word1, 'word_canvas_a')
     },
     word2(val) {
-      this.wc.initScene(this.word1, this.word2)
+      this.wc.initScene(this.word2, 'word_canvas_b')
     },
-  }
+  },
   mounted() {
-    this.wc.initScene(this.word1, this.word2)
+    this.wc.initScene(this.word1, 'word_canvas_a')
+    this.wc.initScene(this.word2, 'word_canvas_b')
   }
 }
 </script>
