@@ -206,10 +206,13 @@ def question_list():
 
 
 def handle_service_data():
-    filenames = ['c_all_handle_service_revised']
+    '''
+    prepare data for causality graph
+    '''
+    filenames = ['q31_all', 'q31_with_job', 'q31_without_job']
     for fn in filenames:
         dataset = pd.read_csv('../data/raw/text_questions/'+fn+'.csv',
-                              usecols=[1, 2])
+                              usecols=[0, 1])
         dataset = dataset.values
         handle_count = collections.defaultdict(int)
         service_count = collections.defaultdict(int)
@@ -238,14 +241,7 @@ def handle_service_data():
                 snode_id += 1
             edges.append(dict(source=node_handle_id[handle],
                               target=node_service_id[service]))
-        # sort nodes
-        # hnodes = sorted(hnodes, key=lambda d: d['count'], reverse=True)
-        # snodes = sorted(snodes, key=lambda d: d['count'], reverse=True)
-        # for i, node in enumerate(hnodes):
-        #     node['nid'] = i
-        # for i, node in enumerate(snodes):
-        #     node['nid'] = i
-        with open('../data/raw/text_questions/relation.json', 'w') as f:
+        with open('../data/raw/text_questions/'+fn+'.json', 'w') as f:
             jsonfile = dict(hnodes=hnodes, snodes=snodes, edges=edges)
             json.dump(jsonfile, f)
             print('end')

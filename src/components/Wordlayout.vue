@@ -90,4 +90,8 @@ export default {
     font-size: 15px;
     font-family: Consolas, courier;
   }
+  #wordlayout {
+    position: relative;
+    float: right;
+  }
 </style>

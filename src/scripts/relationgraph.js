@@ -4,10 +4,11 @@ import * as d3 from 'd3'
 export default class Relationgraph {
   constructor() {
     this.width = 1000
-    this.height = 960
+    this.height = 1000//960
   }
-  initScene() {
-    fetch('../static/relation.json')
+  initScene(filename) {
+    document.getElementById('relationgraph').innerHTML = ''
+    fetch(`../static/${filename}.json`)
       .then(res => res.json())
       .then(dataset => {
         const hnodes = dataset.hnodes,

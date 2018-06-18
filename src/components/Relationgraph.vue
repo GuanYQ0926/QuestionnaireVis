@@ -13,7 +13,7 @@ export default {
     }
   },
   mounted() {
-    this.eventHub.$on('initRelationgraphScene', () => this.rg.initScene())
+    this.eventHub.$on('initRelationgraphScene', filename => this.rg.initScene(filename))
   },
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="heatmap-selector">
-      <el-select v-model="data1" placeholder="A1" size="mini">
+      <el-select v-model="data1" placeholder="A1初期" size="mini">
         <el-option
           v-for="data in dataset1"
           :key="data.value"
@@ -19,8 +19,18 @@
       </el-select>
     </div>
     <heatmap></heatmap>
-    <wordcloud></wordcloud>
+    <div id="relationgraph-selector">
+      <el-select v-model="data3" placeholder="問題31全員" size="mini">
+        <el-option
+          v-for="data in dataset3"
+          :key="data.value"
+          :label="data.label"
+          :value="data.value">
+        </el-option>
+      </el-select>
+    </div>
     <relationgraph></relationgraph>
+    <wordcloud></wordcloud>
   </div>
 </template>
 
@@ -55,6 +65,12 @@ export default {
       {value: '../static/B2.json', label: 'B2中期'},
       {value: '../static/B3.json', label: 'B3後期'}
     ],
+    data3: 'q31_all',
+    dataset3: [
+      {value: 'q31_all', label: '問題31全員'},
+      {value: 'q31_with_job', label: '問題31仕事有り'},
+      {value: 'q31_without_job', label: '問題31仕事無し'}
+    ],
   }),
   components: {
     heatmap: Heatmap,
@@ -68,13 +84,15 @@ export default {
     data2(val) {
       this.eventHub.$emit('initHeatmapScene', this.data1, this.data2)
     },
+    data3(val) {
+      this.eventHub.$emit('initRelationgraphScene', this.data3)
+    }
   },
   methods: {
   },
   mounted() {
     this.eventHub.$emit('initHeatmapScene', this.data1, this.data2)
-    this.eventHub.$emit('initWordlayoutScene', this.word1, this.word2)
-    this.eventHub.$emit('initRelationgraphScene')
+    this.eventHub.$emit('initRelationgraphScene', this.data3)
   }
 }
 </script>
