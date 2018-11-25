@@ -5,6 +5,6 @@
   "author": "YuqingGuan",
   "private": true,
   "scripts": {
-    "postinstall": "npm install express --save"
+    "postinstall": "npm install express"
   }
 }
