@@ -17,16 +17,12 @@
     "babel-preset-env": "^1.6.1",
     "colormap": "^2.3.0",
     "css-loader": "^0.28.11",
-    "d3": "^5.2.0",
-    "element-ui": "^2.3.7",
     "eslint": "^4.19.1",
     "eslint-plugin-html": "^4.0.3",
-    "express": "^4.16.4",
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.4.0",
-    "serve-static": "^1.13.2",
     "style-loader": "^0.21.0",
     "vue": "^2.5.16",
     "vue-loader": "^15.0.9",
@@ -37,6 +33,10 @@
     "wordcloud": "^1.1.0"
   },
   "dependencies": {
-    "postinstall": "^0.4.2"
+    "d3": "^5.7.0",
+    "element-ui": "^2.4.11",
+    "express": "^4.16.4",
+    "postinstall": "^0.4.2",
+    "serve-static": "^1.13.2"
   }
 }
