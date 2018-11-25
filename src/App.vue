@@ -1,101 +1,174 @@
 <template>
   <div id="app">
-    <div id="heatmap-selector">
-      <el-select v-model="data1" placeholder="A1初期" size="mini">
-        <el-option
-          v-for="data in dataset1"
-          :key="data.value"
-          :label="data.label"
-          :value="data.value">
-        </el-option>
-      </el-select>
-      <el-select v-model="data2" placeholder="--" size="mini">
-        <el-option
-          v-for="data in dataset2"
-          :key="data.value"
-          :label="data.label"
-          :value="data.value">
-        </el-option>
-      </el-select>
-    </div>
-    <heatmap></heatmap>
-    <div id="relationgraph-selector">
-      <el-select v-model="data3" placeholder="問題31全員" size="mini">
-        <el-option
-          v-for="data in dataset3"
-          :key="data.value"
-          :label="data.label"
-          :value="data.value">
-        </el-option>
-      </el-select>
+    <div id="q-selector">
+      <el-transfer
+        v-model="value1"
+        :data="answerData"
+        :titles="['未選択', '選択']">
+      </el-transfer>
+      <el-row>
+        <el-button type="primary" @click="onSubmit">確認</el-button>
+      </el-row>
     </div>
     <relationgraph></relationgraph>
-    <wordcloud></wordcloud>
   </div>
 </template>
 
 <script>
-import Heatmap from './components/Heatmap.vue'
-import Wordcloud from './components/Wordlayout.vue'
 import Relationgraph from './components/Relationgraph.vue'
 
 export default {
   name: 'App',
-  data: () => ({
-    data1: '../static/A1.json',
-    dataset1: [
-      {value: '../static/A.json', label: 'A初産'},
-      {value: '../static/A1.json', label: 'A1初期'},
-      {value: '../static/A2.json', label: 'A2中期'},
-      {value: '../static/A3.json', label: 'A3後期'},
-      {value: '../static/B.json', label: 'B径産'},
-      {value: '../static/B1.json', label: 'B1初期'},
-      {value: '../static/B2.json', label: 'B2中期'},
-      {value: '../static/B3.json', label: 'B3後期'}
-    ],
-    data2: 'None',
-    dataset2: [
-      {value: 'None', label: '--'},
-      {value: '../static/A.json', label: 'A初産'},
-      {value: '../static/A1.json', label: 'A1初期'},
-      {value: '../static/A2.json', label: 'A2中期'},
-      {value: '../static/A3.json', label: 'A3後期'},
-      {value: '../static/B.json', label: 'B径産'},
-      {value: '../static/B1.json', label: 'B1初期'},
-      {value: '../static/B2.json', label: 'B2中期'},
-      {value: '../static/B3.json', label: 'B3後期'}
-    ],
-    data3: 'q31_all',
-    dataset3: [
-      {value: 'q31_all', label: '問題31全員'},
-      {value: 'q31_with_job', label: '問題31仕事有り'},
-      {value: 'q31_without_job', label: '問題31仕事無し'}
-    ],
-  }),
+  data() {
+    const generateAnswerData = _ => {
+      const qIdx = [31, 19, 3, 35, 30, 9, 94, 34, 4, 6]
+      const data = qIdx.map((d, i) => {
+        return {key: d, label: `問題${d} (${i+1}位)`}
+      })
+      return data
+    }
+    return {
+      value1: [],
+      answerData: generateAnswerData(),
+      graphData: null,
+    }
+  },
   components: {
-    heatmap: Heatmap,
-    wordcloud: Wordcloud,
     relationgraph: Relationgraph,
   },
   watch: {
-    data1(val) {
-      this.eventHub.$emit('initHeatmapScene', this.data1, this.data2)
-    },
-    data2(val) {
-      this.eventHub.$emit('initHeatmapScene', this.data1, this.data2)
-    },
-    data3(val) {
-      this.eventHub.$emit('initRelationgraphScene', this.data3)
-    }
   },
   methods: {
+    onSubmit() {
+      if(this.value1.length == 0) {
+        alert('please select questions')
+      }
+      else {
+        if(this.graphData) {
+          // set data
+          let data = []
+          let hnodes = [],  // nid, count, type, text, qs
+            snodes = [],  // nid, count, type, text, qs
+            edges = []  // source, target
+          let textHIdx = {},
+            textSIdx = {},
+            idxHInfo = {},
+            idxSInfo = {}
+          for(const qIdx of this.value1) {
+            const dataset = this.graphData[qIdx]
+            // hnodes
+            for(const nObj of dataset.hnodes) {
+              const nid = nObj.nid,
+                count = nObj.count,
+                type = nObj.type,
+                text = nObj.text
+              // text - id
+              if(!(text in textHIdx)) {
+                textHIdx[text] = Object.keys(textHIdx).length
+              }
+              const curIdx = textHIdx[text]
+              // id info
+              if(curIdx in idxHInfo) {
+                idxHInfo[curIdx].count += count
+                idxHInfo[curIdx].qs.push(`Q${qIdx}`)
+              }
+              else {
+                idxHInfo[curIdx] = {
+                  nid: curIdx,
+                  count: count,
+                  type: type,
+                  text: text,
+                  qs: [`Q${qIdx}`]
+                }
+              }
+            }
+            // snodes
+            for(const nObj of dataset.snodes) {
+              const nid = nObj.nid,
+                count = nObj.count,
+                type = nObj.type,
+                text = nObj.text
+              // text - id
+              if(!(text in textSIdx)) {
+                textSIdx[text] = Object.keys(textSIdx).length
+              }
+              const curIdx = textSIdx[text]
+              // id info
+              if(curIdx in idxSInfo) {
+                idxSInfo[curIdx].count += count
+                idxSInfo[curIdx].qs.push(`Q${qIdx}`)
+              }
+              else {
+                idxSInfo[curIdx] = {
+                  nid: curIdx,
+                  count: count,
+                  type: type,
+                  text: text,
+                  qs: [`Q${qIdx}`]
+                }
+              }
+            }
+            // edges
+            for(const eObj of dataset.edges) {
+              const source = eObj.source,
+                target = eObj.target
+              const srcText = dataset.hnodes[source].text,
+                dstText = dataset.snodes[target].text
+              edges.push({
+                source: textHIdx[srcText],
+                target: textSIdx[dstText]
+              })
+            }
+          }
+          // generate graph
+          for(const idx in idxHInfo) {
+            let temp = idxHInfo[idx]
+            temp.nid = +idx
+            hnodes.push(temp)
+          }
+          for(const idx in idxSInfo) {
+            let temp = idxSInfo[idx]
+            temp.nid = +idx
+            snodes.push(temp)
+          }
+          this.eventHub.$emit('initRelationgraphScene', {hnodes: hnodes, snodes: snodes, edges: edges})
+        }
+        else {
+          alert('fail to load data')
+        }
+      }
+    },
+    loadData() {
+      fetch('../static/relationgraph.json')
+        .then(res => res.json())
+        .then(dataset => {
+          this.graphData = dataset
+        })
+    },
+    // async loadData() {
+    //   const res = await fetch('../static/relationgraph.json')
+    //   const graphData = await res.json()
+    //   return graphData
+    // },
   },
   mounted() {
-    this.eventHub.$emit('initHeatmapScene', this.data1, this.data2)
-    this.eventHub.$emit('initRelationgraphScene', this.data3)
+    // this.loadData()
+    //   .then(graphData => {
+    //     this.graphData = graphData
+    //   })
+    this.loadData()
   }
 }
 </script>
 
 <style>
+#q-selector {
+  position: absolute;
+  margin-left: 0;
+  margin-right: 100%;
+}
+#relationgraph {
+  position: absolute;
+  margin-left: 10%;
+}
 </style>

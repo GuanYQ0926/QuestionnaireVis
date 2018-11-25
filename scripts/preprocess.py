@@ -117,10 +117,12 @@ def question_xlsx():
     # export to xls
     fileinfo = {'c_all': 'C妊娠期仕事有n=527', 'c_1': 'C1初産n=322',
                 'c_2': 'C2径産n=205', 'c_3': 'C3初期n=206', 'c_4': 'C4中期n=160',
-                'c_5': 'C5後期n=161', 'd_all': 'D妊娠期仕事なしn=709'}
-    workbook = xlsxwriter.Workbook('../static/妊娠期問題.xlsx')
+                'c_5': 'C5後期n=161', 'd_all': 'D妊娠期仕事なしn=709',
+                'cd_all': '妊娠期全体N=1236'}
+    workbook = xlsxwriter.Workbook('../data/raw/text_questions/妊娠期問題.xlsx')
     for filename, sheet in fileinfo.items():
         ranks_list, q_nums = ranking(filename)
+        # new sheet
         worksheet = workbook.add_worksheet(sheet)
         worksheet.set_column('D:D', 100)
         worksheet.set_column('E:E', 15)
@@ -149,11 +151,14 @@ def answer_xlsx():
     '''
     fileinfo = {'c_all': 'C妊娠期仕事有n=527', 'c_1': 'C1初産n=322',
                 'c_2': 'C2径産n=205', 'c_3': 'C3初期n=206', 'c_4': 'C4中期n=160',
-                'c_5': 'C5後期n=161', 'd_all': 'D妊娠期仕事なしn=709'}
+                'c_5': 'C5後期n=161', 'd_all': 'D妊娠期仕事なしn=709',
+                'cd_all': '妊娠期全体N=1236'}
+    fileinfo = {'cd_all': '妊娠期全体N=1236'}
     for fn, desc in fileinfo.items():
         # question information
         dataset = pd.read_csv('../data/raw/text_questions/'+fn+'_ranking.csv')
         q_info = dataset.values[:10]
+        q_info = dataset.values[:]
         # answer information
         dataset = pd.read_csv('../data/raw/dataset/'+fn+'.csv',
                               usecols=range(149, 158))
@@ -173,7 +178,7 @@ def answer_xlsx():
                             continue
                         question_handle[q_index][handle].append(service)
         # export to xlsx
-        xls_path = '../data/raw/text_questions/'+fn+'_answer.xlsx'
+        xls_path = '../data/raw/text_questions/'+desc+'_answer.xlsx'
         workbook = xlsxwriter.Workbook(xls_path)
         for question, handle_service in question_handle.items():
             worksheet = workbook.add_worksheet(str(question))
@@ -190,22 +195,7 @@ def answer_xlsx():
         workbook.close()
 
 
-def question_list():
-    filename = 'Layout'
-    dataset = pd.read_csv('../data/' + filename + '.csv',
-                          header=None, usecols=[8])
-    dataset = dataset.values.T[0]
-    q12 = dataset[271:440:6].tolist()
-    q13 = dataset[446:591:6].tolist()
-    q14 = dataset[597:694:6].tolist()
-    q15 = dataset[700:851:6].tolist()
-    questions = q12 + q13 + q14 + q15
-    jsonfile = dict(questions=questions)
-    with open('../static/questions.json', 'w') as f:
-        json.dump(jsonfile, f)
-
-
-def handle_service_data():
+def handle_service_graph_data():
     '''
     prepare data for causality graph
     '''
@@ -247,10 +237,72 @@ def handle_service_data():
             print('end')
 
 
+def generate_relation_graph_data():
+    '''
+    generate relation graph data
+    '''
+    relationgraph = {}
+    # ordered by concernedness
+    filenames = [31, 19, 3, 35, 30, 9, 94, 34, 4, 6]
+    for fn in filenames:
+        dataset = pd.read_csv('../data/raw/revised/answer_csv/'+str(fn)+'.csv',
+                              usecols=[0, 1])
+        dataset = dataset.values
+        handle_count = collections.defaultdict(int)
+        service_count = collections.defaultdict(int)
+        for data in dataset:
+            handle, service = data[0], data[1]
+            handle_count[handle] += 1
+            service_count[service] += 1
+        # generate node
+        hnodes, snodes, edges = [], [], []
+        node_handle_id = {}
+        node_service_id = {}
+        hnode_id, snode_id = 0, 0
+        for data in dataset:
+            handle, service = data[0], data[1]
+            if pd.isnull(handle) or pd.isnull(service):
+                print('empty')
+                continue
+            if handle not in node_handle_id:
+                node_handle_id[handle] = hnode_id
+                count = handle_count[handle]
+                hnodes.append(dict(nid=hnode_id, count=count, type='handle',
+                                   text=handle))
+                hnode_id += 1
+            if service not in node_service_id:
+                node_service_id[service] = snode_id
+                count = service_count[service]
+                snodes.append(dict(nid=snode_id, count=count, type='service',
+                                   text=service))
+                snode_id += 1
+            edges.append(dict(source=node_handle_id[handle],
+                              target=node_service_id[service]))
+        relationgraph[str(fn)] = dict(hnodes=hnodes, snodes=snodes,
+                                      edges=edges)
+    with open('../data/raw/revised/relationgraph.json', 'w') as f:
+        json.dump(relationgraph, f)
+
+
+def question_list():
+    filename = 'Layout'
+    dataset = pd.read_csv('../data/' + filename + '.csv',
+                          header=None, usecols=[8])
+    dataset = dataset.values.T[0]
+    q12 = dataset[271:440:6].tolist()
+    q13 = dataset[446:591:6].tolist()
+    q14 = dataset[597:694:6].tolist()
+    q15 = dataset[700:851:6].tolist()
+    questions = q12 + q13 + q14 + q15
+    jsonfile = dict(questions=questions)
+    with open('../static/questions.json', 'w') as f:
+        json.dump(jsonfile, f)
+
+
 if __name__ == '__main__':
     # heatmap_data()
     # wordcloud_data()
     # question_list()
     # question_xlsx()
     # answer_xlsx()
-    handle_service_data()
+    generate_relation_graph_data()

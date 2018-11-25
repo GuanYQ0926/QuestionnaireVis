@@ -1,22 +1,19 @@
 import Vue from 'vue'
 import App from './App.vue'
 import {
-  Select,
-  Option,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
-  Checkbox,
+  Button,
+  Row,
+  Transfer,
 } from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import lang from 'element-ui/lib/locale/lang/en'
+import locale from 'element-ui/lib/locale'
 
 
-Vue.use(Select)
-Vue.use(Option)
-Vue.use(Dropdown)
-Vue.use(DropdownMenu)
-Vue.use(DropdownItem)
-Vue.use(Checkbox)
+Vue.use(Transfer)
+Vue.use(Row)
+Vue.use(Button)
+locale.use(lang)
 
 const eventHub = new Vue()
 Vue.mixin({

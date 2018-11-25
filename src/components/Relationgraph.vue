@@ -13,7 +13,7 @@ export default {
     }
   },
   mounted() {
-    this.eventHub.$on('initRelationgraphScene', filename => this.rg.initScene(filename))
+    this.eventHub.$on('initRelationgraphScene', graphData => this.rg.initScene(graphData))
   },
 }
 </script>
@@ -21,20 +21,19 @@ export default {
 <style>
 #relationgraph {
   position: relative;
-  float: left;
+  float: right;
 }
 .links path {
-  fill: #777;
-  stroke: #999;
+  stroke: #777;
   stroke-opacity: 0.6;
-  stroke-width: 1.5px;
+  stroke-width: 1px;
 }
 
-.nodes circle {
+/* .nodes circle {
   fill: steelblue;
   stroke: #fff;
   stroke-width: 1px;
-}
+} */
 
 .nodes text {
   font: 10px sans-serif;
