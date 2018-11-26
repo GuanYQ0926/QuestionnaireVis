@@ -3,15 +3,15 @@ import * as d3 from 'd3'
 
 export default class Relationgraph {
   constructor() {
-    this.width = window.innerWidth
-    this.height = 4000
   }
   initScene(dataset) {
     document.getElementById('relationgraph').innerHTML = ''
     const hnodes = dataset.hnodes,
       snodes = dataset.snodes,
       edges = dataset.edges,
-      space = 200
+      space = 200,
+      width = window.innerWidth,
+      height = dataset.snodes.length*18
     // prepare node data
     for(const i in hnodes) {
       const node = hnodes[i]
@@ -39,8 +39,8 @@ export default class Relationgraph {
     const svg = d3.select(document.getElementById('relationgraph'))
       .append('svg')
       .attr('class', 'graph-svg')
-      .attr('width', this.width)
-      .attr('height', this.height)
+      .attr('width', width)
+      .attr('height', height)
       .append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
     const extent = d3.extent(nodeData, d => d.count)
