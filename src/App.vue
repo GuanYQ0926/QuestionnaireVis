@@ -22,8 +22,19 @@ export default {
   data() {
     const generateAnswerData = _ => {
       const qIdx = [31, 19, 3, 35, 30, 9, 94, 34, 4, 6]
+      const qIdxDesp = {
+        '31': '胎児／赤ちゃんの健康状態が気になる',
+        '19': '身体／体重・体型に関する悩み',
+        '3': '身体／つわりで気分が悪い',
+        '35': '出産／無事に出産できるか不安である',
+        '30': '胎児／赤ちゃんの成長・発育状態に対する不安がある',
+        '9': '身体／便に関する問題がある',
+        '94': '経済／将来的に経済的な不安を感じる',
+        '34': '出産／お産の痛みに不安がある',
+        '4': '身体／肩こり、腰痛、腱鞘炎など身体に痛みがある',
+        '6': '身体／お腹の張りが気になる'}
       const data = qIdx.map((d, i) => {
-        return {key: d, label: `問題${d} (${i+1}位)`}
+        return {key: d, label: `問題${d} (${i+1}位) : ${qIdxDesp[d.toString()]}`}
       })
       return data
     }
@@ -163,12 +174,16 @@ export default {
 
 <style>
 #q-selector {
+  width: 100px;
   position: absolute;
   margin-left: 0;
   margin-right: 100%;
 }
+.el-transfer .el-transfer-panel {
+  width: 470px;
+}
 #relationgraph {
   position: absolute;
-  margin-left: 10%;
+  margin-left: 25%;
 }
 </style>
