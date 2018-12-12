@@ -6,84 +6,6 @@ import collections
 import xlsxwriter
 
 
-def heatmap_data():
-    filenames = ['A', 'A1', 'A2', 'A3', 'B', 'B1', 'B2', 'B3']
-    '''
-    q12: [4, 33), q13: [33, 58), q14: [58: 75), q15: [75, 101)
-    '''
-    for fn in filenames:
-        jsonfile = []
-        dataset = pd.read_csv('../data/' + fn + '.csv',
-                              usecols=range(4, 101))
-        dataset = dataset.values.T  # question 12 to 15
-        # parti_count = len(dataset[0])
-        for x, question in enumerate(dataset):  # a certain question
-            # res = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
-            res = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
-            for answer in question:  # each answer
-                if np.isnan(answer):
-                    # res['5'] += 1
-                    pass
-                else:
-                    res[str(int(answer))] += 1
-            for key, val in res.items():
-                jsonfile.append(dict(question=x, answer=int(key)-1, value=val))
-        with open('../static/' + fn + '.json', 'w') as f:
-            json.dump(jsonfile, f)
-
-
-def wordcloud_data():
-    tagger = MeCab.Tagger('mecabrc')
-    tagger.parse('')
-    fileinfo = {'c_all': 'C妊娠期仕事有n=527', 'c_1': 'C1初産n=322',
-                'c_2': 'C2径産n=205', 'c_3': 'C3初期n=206', 'c_4': 'C4中期n=160',
-                'c_5': 'C5後期n=161', 'd_all': 'D妊娠期仕事なしn=709'}
-    deal_jsonfile = {}
-    service_jsonfile = {}
-    for filename, desc in fileinfo.items():
-        dataset = pd.read_csv('../data/raw/dataset/' + filename + '.csv',
-                              usecols=range(152, 158))
-        dataset = dataset.values.T
-        deal_result = collections.defaultdict(int)
-        service_result = collections.defaultdict(int)
-        for i in [0, 2, 4]:
-            deal_data = dataset[i]
-            for text in deal_data:
-                if pd.isnull(text):
-                    continue
-                temp = tagger.parse(text)
-                for row in temp.split('\n'):
-                    word = row.split('\t')[0]
-                    if word == 'EOS':
-                        break
-                    else:
-                        pos = row.split('\t')[1].split(',')[0]
-                        # if pos != '助詞' and pos != '助動詞':
-                        if pos == '名詞' or pos == '動詞':  # or pos == '形容詞':
-                            deal_result[word] += 1
-        for i in [1, 3, 5]:
-            service_data = dataset[i]
-            for text in service_data:
-                if pd.isnull(text):
-                    continue
-                temp = tagger.parse(text)
-                for row in temp.split('\n'):
-                    word = row.split('\t')[0]
-                    if word == 'EOS':
-                        break
-                    else:
-                        pos = row.split('\t')[1].split(',')[0]
-                        # if pos != '助詞' and pos != '助動詞':
-                        if pos == '名詞' or pos == '動詞' or pos == '形容詞':
-                            service_result[word] += 1
-        deal_jsonfile[filename] = deal_result
-        service_jsonfile[filename] = service_result
-    with open('../static/wordcloud/deal.json', 'w') as f:
-        json.dump(deal_jsonfile, f)
-    with open('../static/wordcloud/service.json', 'w') as f:
-        json.dump(service_jsonfile, f)
-
-
 def question_xlsx():
     '''
     export overview of concerned question to xlsx
@@ -195,48 +117,6 @@ def answer_xlsx():
         workbook.close()
 
 
-def handle_service_graph_data():
-    '''
-    prepare data for causality graph
-    '''
-    filenames = ['q31_all', 'q31_with_job', 'q31_without_job']
-    for fn in filenames:
-        dataset = pd.read_csv('../data/raw/text_questions/'+fn+'.csv',
-                              usecols=[0, 1])
-        dataset = dataset.values
-        handle_count = collections.defaultdict(int)
-        service_count = collections.defaultdict(int)
-        for data in dataset:
-            handle, service = data[0], data[1]
-            handle_count[handle] += 1
-            service_count[service] += 1
-        # generate node
-        hnodes, snodes, edges = [], [], []
-        node_handle_id = {}
-        node_service_id = {}
-        hnode_id, snode_id = 0, 0
-        for data in dataset:
-            handle, service = data[0], data[1]
-            if handle not in node_handle_id:
-                node_handle_id[handle] = hnode_id
-                count = handle_count[handle]
-                hnodes.append(dict(nid=hnode_id, count=count, type='handle',
-                                   text=handle))
-                hnode_id += 1
-            if service not in node_service_id:
-                node_service_id[service] = snode_id
-                count = service_count[service]
-                snodes.append(dict(nid=snode_id, count=count, type='service',
-                                   text=service))
-                snode_id += 1
-            edges.append(dict(source=node_handle_id[handle],
-                              target=node_service_id[service]))
-        with open('../data/raw/text_questions/'+fn+'.json', 'w') as f:
-            jsonfile = dict(hnodes=hnodes, snodes=snodes, edges=edges)
-            json.dump(jsonfile, f)
-            print('end')
-
-
 def generate_relation_graph_data():
     '''
     generate relation graph data
@@ -246,7 +126,7 @@ def generate_relation_graph_data():
     filenames = [31, 19, 3, 35, 30, 9, 94, 34, 4, 6]
     for fn in filenames:
         dataset = pd.read_csv('../data/raw/revised/answer_csv/'+str(fn)+'.csv',
-                              usecols=[0, 1])
+                              usecols=[1, 2])
         dataset = dataset.values
         handle_count = collections.defaultdict(int)
         service_count = collections.defaultdict(int)
@@ -259,11 +139,16 @@ def generate_relation_graph_data():
         node_handle_id = {}
         node_service_id = {}
         hnode_id, snode_id = 0, 0
-        for data in dataset:
+        cur_handle = ''
+        for idx, data in enumerate(dataset):
             handle, service = data[0], data[1]
-            if pd.isnull(handle) or pd.isnull(service):
-                print('empty')
-                continue
+            if pd.isnull(service):
+                print('===================', fn, idx, '===================')
+                print('error in service column')
+                return
+            if pd.isnull(handle):
+                handle = cur_handle
+            cur_handle = handle
             if handle not in node_handle_id:
                 node_handle_id[handle] = hnode_id
                 count = handle_count[handle]
@@ -285,6 +170,9 @@ def generate_relation_graph_data():
 
 
 def question_list():
+    '''
+    list out questions
+    '''
     filename = 'Layout'
     dataset = pd.read_csv('../data/' + filename + '.csv',
                           header=None, usecols=[8])
@@ -299,9 +187,127 @@ def question_list():
         json.dump(jsonfile, f)
 
 
+def deprecated_function():
+    def heatmap_data():
+        filenames = ['A', 'A1', 'A2', 'A3', 'B', 'B1', 'B2', 'B3']
+        '''
+        q12: [4, 33), q13: [33, 58), q14: [58: 75), q15: [75, 101)
+        '''
+        for fn in filenames:
+            jsonfile = []
+            dataset = pd.read_csv('../data/' + fn + '.csv',
+                                  usecols=range(4, 101))
+            dataset = dataset.values.T  # question 12 to 15
+            # parti_count = len(dataset[0])
+            for x, question in enumerate(dataset):  # a certain question
+                # res = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+                res = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+                for answer in question:  # each answer
+                    if np.isnan(answer):
+                        # res['5'] += 1
+                        pass
+                    else:
+                        res[str(int(answer))] += 1
+                for key, val in res.items():
+                    jsonfile.append(dict(question=x, answer=int(key)-1,
+                                         value=val))
+            with open('../static/' + fn + '.json', 'w') as f:
+                json.dump(jsonfile, f)
+
+    def wordcloud_data():
+        tagger = MeCab.Tagger('mecabrc')
+        tagger.parse('')
+        fileinfo = {'c_all': 'C妊娠期仕事有n=527', 'c_1': 'C1初産n=322',
+                    'c_2': 'C2径産n=205', 'c_3': 'C3初期n=206', 'c_4': 'C4中期n=160',
+                    'c_5': 'C5後期n=161', 'd_all': 'D妊娠期仕事なしn=709'}
+        deal_jsonfile = {}
+        service_jsonfile = {}
+        for filename, desc in fileinfo.items():
+            dataset = pd.read_csv('../data/raw/dataset/' + filename + '.csv',
+                                  usecols=range(152, 158))
+            dataset = dataset.values.T
+            deal_result = collections.defaultdict(int)
+            service_result = collections.defaultdict(int)
+            for i in [0, 2, 4]:
+                deal_data = dataset[i]
+                for text in deal_data:
+                    if pd.isnull(text):
+                        continue
+                    temp = tagger.parse(text)
+                    for row in temp.split('\n'):
+                        word = row.split('\t')[0]
+                        if word == 'EOS':
+                            break
+                        else:
+                            pos = row.split('\t')[1].split(',')[0]
+                            # if pos != '助詞' and pos != '助動詞':
+                            if pos == '名詞' or pos == '動詞':  # or pos == '形容詞':
+                                deal_result[word] += 1
+            for i in [1, 3, 5]:
+                service_data = dataset[i]
+                for text in service_data:
+                    if pd.isnull(text):
+                        continue
+                    temp = tagger.parse(text)
+                    for row in temp.split('\n'):
+                        word = row.split('\t')[0]
+                        if word == 'EOS':
+                            break
+                        else:
+                            pos = row.split('\t')[1].split(',')[0]
+                            # if pos != '助詞' and pos != '助動詞':
+                            if pos == '名詞' or pos == '動詞' or pos == '形容詞':
+                                service_result[word] += 1
+            deal_jsonfile[filename] = deal_result
+            service_jsonfile[filename] = service_result
+        with open('../static/wordcloud/deal.json', 'w') as f:
+            json.dump(deal_jsonfile, f)
+        with open('../static/wordcloud/service.json', 'w') as f:
+            json.dump(service_jsonfile, f)
+
+    def handle_service_graph_data():
+        '''
+        prepare data for causality graph
+        '''
+        filenames = ['q31_all', 'q31_with_job', 'q31_without_job']
+        for fn in filenames:
+            dataset = pd.read_csv('../data/raw/text_questions/'+fn+'.csv',
+                                  usecols=[0, 1])
+            dataset = dataset.values
+            handle_count = collections.defaultdict(int)
+            service_count = collections.defaultdict(int)
+            for data in dataset:
+                handle, service = data[0], data[1]
+                handle_count[handle] += 1
+                service_count[service] += 1
+            # generate node
+            hnodes, snodes, edges = [], [], []
+            node_handle_id = {}
+            node_service_id = {}
+            hnode_id, snode_id = 0, 0
+            for data in dataset:
+                handle, service = data[0], data[1]
+                if handle not in node_handle_id:
+                    node_handle_id[handle] = hnode_id
+                    count = handle_count[handle]
+                    hnodes.append(dict(nid=hnode_id, count=count,
+                                       type='handle', text=handle))
+                    hnode_id += 1
+                if service not in node_service_id:
+                    node_service_id[service] = snode_id
+                    count = service_count[service]
+                    snodes.append(dict(nid=snode_id, count=count,
+                                       type='service', text=service))
+                    snode_id += 1
+                edges.append(dict(source=node_handle_id[handle],
+                                  target=node_service_id[service]))
+            with open('../data/raw/text_questions/'+fn+'.json', 'w') as f:
+                jsonfile = dict(hnodes=hnodes, snodes=snodes, edges=edges)
+                json.dump(jsonfile, f)
+                print('end')
+
+
 if __name__ == '__main__':
-    # heatmap_data()
-    # wordcloud_data()
     # question_list()
     # question_xlsx()
     # answer_xlsx()

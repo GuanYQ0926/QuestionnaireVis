@@ -9,9 +9,9 @@ export default class Relationgraph {
     const hnodes = dataset.hnodes,
       snodes = dataset.snodes,
       edges = dataset.edges,
-      space = 200,
+      space = 200,  // padding between handle and service
       width = window.innerWidth,
-      height = dataset.snodes.length*18
+      height = Math.max(hnodes.length*18, snodes.length*18)
     // prepare node data
     for(const i in hnodes) {
       const node = hnodes[i]
