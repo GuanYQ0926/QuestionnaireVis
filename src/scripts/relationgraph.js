@@ -81,6 +81,7 @@ export default class Relationgraph {
       .on('click', function(d) {
         node.selectAll('circle').style('fill', '#777')
         node.selectAll('text').style('fill', '#777')
+          .style('font-size', null)
         link.style('stroke-opacity', 0)
 
         d3.select(this).selectAll('circle').style('fill', '#E84A5F')
@@ -98,14 +99,6 @@ export default class Relationgraph {
           .style('stroke-width', link_d => link_d.source === d | link_d.target === d ? 3 : null)
           .style('stroke-opacity', link_d => link_d.source === d | link_d.target === d ? 1 : 0)
       })
-      // .on('mouseout', function() {
-      //   node.selectAll('circle').style('fill', d => d.type=='handle'?'#99B898':'#FECEAB')
-      //   node.selectAll('text').style('fill', '#474747')
-      //   node.selectAll('text').style('font-size', null)
-      //   link.style('stroke', null)
-      //     .style('stroke-opacity', null)
-      //     .style('stroke-width', null)
-      // })
     d3.select('.graph-svg')
       .on('click', function() {
         if(this == d3.event.target) {
