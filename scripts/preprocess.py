@@ -126,7 +126,7 @@ def generate_relation_graph_data():
     filenames = [31, 19, 3, 35, 30, 9, 94, 34, 4, 6]
     for fn in filenames:
         dataset = pd.read_csv('../data/raw/revised/answer_csv/'+str(fn)+'.csv',
-                              usecols=[1, 2])
+                              usecols=[0, 1])
         dataset = dataset.values
         handle_count = collections.defaultdict(int)
         service_count = collections.defaultdict(int)
@@ -147,6 +147,7 @@ def generate_relation_graph_data():
                 print('error in service column')
                 return
             if pd.isnull(handle):
+                print('empty in handle column')
                 handle = cur_handle
             cur_handle = handle
             if handle not in node_handle_id:
